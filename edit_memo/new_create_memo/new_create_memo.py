@@ -27,7 +27,7 @@ def input_sh_format(wb: xw.main.Book):
 
 def input_index_sh_format(wb: xw.main.Book):
     sh = wb.sheets(const.INPUT_INDEX_SH_NAME)
-    get_cell_range(sh, "B6", "B5").clear_contents()
+    get_cell_range(sh, "B6", "B5").clear()
 
 
 def cover_sh_format(wb: xw.main.Book):
@@ -58,5 +58,6 @@ def new_create_memo(wb: xw.main.Book):
     # 各種シート初期化:目次、内容、索引
     sh_format(wb.sheets(const.TOC_SH_NAME))
     sh_format(wb.sheets(const.CONTENTS_SH_NAME))
-    sh_format(wb.sheets(const.INPUT_INDEX_SH_NAME))
+    sh_format(wb.sheets(const.INDEX_SH_NAME))
+    wb.sheets(const.COVER_SH_NAME).activate()
     wb.save()
