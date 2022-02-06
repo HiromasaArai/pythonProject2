@@ -3,7 +3,7 @@ import datetime
 import xlwings as xw
 
 from edit_memo.common import const
-from edit_memo.common.sh_format import sh_format
+from edit_memo.common.util import sh_format
 
 
 def get_cell_range(sh: xw.main.Sheet, srn, ern):

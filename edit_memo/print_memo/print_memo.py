@@ -12,11 +12,11 @@ def sh_page_setup(print_size, sh: xw.main.Sheet):
 
 
 def print_memo(wb: xw.main.Book, print_size):
-    sh = wb.sheets(const.HYOUSHI_SH_NAME)
+    sh = wb.sheets(const.COVER_SH_NAME)
     sh_page_setup(print_size, sh)
-    sh = wb.sheets(const.MOKUZI_SH_NAME)
+    sh = wb.sheets(const.TOC_SH_NAME)
     sh_page_setup(print_size, sh)
-    sh = wb.sheets(const.NAIYOU_SH_NAME)
+    sh = wb.sheets(const.CONTENTS_SH_NAME)
     sh_page_setup(print_size, sh)
-    sh = wb.sheets(const.SAKUIN_SH_NAME)
+    sh = wb.sheets(const.INDEX_SH_NAME)
     sh_page_setup(print_size, sh)
