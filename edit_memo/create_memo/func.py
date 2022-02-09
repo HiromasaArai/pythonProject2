@@ -3,22 +3,29 @@ import datetime
 import xlwings as xw
 
 from edit_memo.common import const
-from edit_memo.common.util import sh_format
 
 
 def get_cell_range(sh: xw.main.Sheet, srn, ern):
-    # 連続するセル範囲を取得する
-    # srn: str: start_rg_nm
-    # ern: str: end_base_rg_nm
+    """
+    連続するセル範囲を取得する
+    :param sh: xlwingsのシートオブジェクト
+    :param srn: start_rg_nm 始まりのセル
+    :param ern: 終わりのセルの起点となるもの
+    :return: セル範囲
+    """
     start_rg = sh.range(srn)
     last_rg = sh.range(sh.range(ern).end("down").row, sh.range(ern).end("right").column)
     return sh.range(start_rg, last_rg)
 
 
 def func_input_sh(wb: xw.main.Book):
+    """
+    入力シート内データ取得に関する関数
+    :param wb:
+    :return:
+    """
     sh = wb.sheets(const.INPUT_SH_NAME)
     rg = get_cell_range(sh, "A3", "C2")
-    # rrc = rg.rows.count
     rg2 = sh.range("I3")
     for i in range(rg.rows.count):
         if rg2.offset(i, 0).value is None:
@@ -31,6 +38,13 @@ def func_input_sh(wb: xw.main.Book):
 
 
 def func_toc_sh(wb: xw.main.Book, rrc, ish_array):
+    """
+    目次シート編集
+    :param wb:
+    :param rrc:
+    :param ish_array:
+    :return:
+    """
     sh = wb.sheets(const.TOC_SH_NAME)
     for i in range(rrc):
         # 分類
@@ -43,9 +57,6 @@ def func_toc_sh(wb: xw.main.Book, rrc, ish_array):
         sh.cells(i + 3, 5).value = ish_array[i][9]
         # No
         sh.cells(i + 3, 6).value = i + 1
-        # 状態
-        # if (datetime.datetime.now().date() - ish_array[i][8]).days <= 7:
-        #     sh.cells(i + 3, 7).value = "NEW"
         # 管理番号
         sh.cells(i + 3, 8).value = ish_array[i][0]
         # 項目番号をリストに追加
@@ -63,7 +74,46 @@ def func_toc_sh(wb: xw.main.Book, rrc, ish_array):
     return ish_array
 
 
+def func_cover(wb, ish_array):
+    """
+    表紙シート編集
+    :param wb:
+    :param ish_array:
+    :return:
+    """
+    sh = wb.sheets(const.COVER_SH_NAME)
+    last_update_date_rg = sh.range("G18")
+    second_last_update_date_rg = sh.range("G20")
+    third_last_update_date_rg = sh.range("G22")
+    item_nm_rg = sh.range("G37")
+    start_date_rg = sh.range("B41")
+    end_update_date_rg = sh.range("G41")
+    # 前々回更新日
+    if second_last_update_date_rg.value is not None:
+        third_last_update_date_rg.value = second_last_update_date_rg.value
+
+    # 前回更新日
+    if last_update_date_rg.value is not None:
+        second_last_update_date_rg.value = last_update_date_rg.value
+
+    # 最終更新日
+    last_update_date_rg.value = datetime.datetime.now().strftime("%Y/%m/%d %T")
+    # 項目数
+    item_nm_rg.value = sorted(ish_array, key=lambda x: x[0], reverse=True)[0][0]
+    # メモ作成開始日
+    start_date_rg.value = sorted(ish_array, key=lambda x: x[8], reverse=False)[0][8]
+    # メモ作成終了日
+    end_update_date_rg.value = sorted(ish_array, key=lambda x: x[9], reverse=True)[0][9]
+
+
 def func_contents(wb: xw.main.Book, rrc, ish_array):
+    """
+    内容シート編集
+    :param wb:
+    :param rrc:
+    :param ish_array:
+    :return:
+    """
     sh = wb.sheets(const.CONTENTS_SH_NAME)
     for i in range(rrc):
         magic_num = i * 6 + 3
@@ -119,6 +169,13 @@ def index_output(sh: xw.main.Sheet, ish_array, i, last_data_row):
 
 
 def func_input_index(wb: xw.main.Book, rrc, ish_array):
+    """
+    索引登録シート初期設定及びデータ取得に関する関数
+    :param wb:
+    :param rrc:
+    :param ish_array:
+    :return:
+    """
     last_data_row = 6
     sh = wb.sheets(const.INPUT_INDEX_SH_NAME)
     if sh.range("B6").value is not None:
@@ -137,6 +194,7 @@ def func_input_index(wb: xw.main.Book, rrc, ish_array):
                 term4 = ish_array[i][2] == i_index_array[i2][4]
                 if term1 and term2 and term3 and term4:
                     is_flag = False
+
             if is_flag:
                 last_data_row = index_output(sh, ish_array, i, last_data_row)
     else:
@@ -156,6 +214,11 @@ def func_input_index(wb: xw.main.Book, rrc, ish_array):
 
 
 def func_index(wb: xw.main.Book):
+    """
+    索引シート編集
+    :param wb:
+    :return:
+    """
     sh = wb.sheets(const.INPUT_INDEX_SH_NAME)
     rg = get_cell_range(sh, "B6", "B5")
     # 索引登録シートのデータをリストして取得し、「ヒョウゴ」項目でソート
@@ -178,22 +241,3 @@ def func_index(wb: xw.main.Book):
     rg.api.Borders(12).LineStyle = 1
     # フォントネームを強制
     rg.font.name = "ＭＳ ゴシック"
-
-
-def create_memo(wb: xw.main.Book):
-    # 入力シートのデータを取得してソート（分類ごと）
-    rg = func_input_sh(wb)
-    rrc = rg.rows.count
-    ish_array = sorted(rg.options(ndim=2).value, key=lambda x: x[3])
-    # 各シート初期化 >>目次、内容、索引
-    sh_format(wb.sheets(const.TOC_SH_NAME))
-    sh_format(wb.sheets(const.CONTENTS_SH_NAME))
-    sh_format(wb.sheets(const.INDEX_SH_NAME))
-    # 目次シート入力
-    ish_array = func_toc_sh(wb, rrc, ish_array)
-    # 内容シート入力
-    func_contents(wb, rrc, ish_array)
-    # 索引登録シート入力
-    func_input_index(wb, rrc, ish_array)
-    # 索引シートの入力
-    func_index(wb)

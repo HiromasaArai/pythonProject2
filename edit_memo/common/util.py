@@ -15,3 +15,18 @@ def sh_format(sh: xw.main.Sheet):
     last_rg = sh.range(sh.range("C2").end("down").row, sh.range("C2").end("right").column)
     rg = sh.range(start_rg, last_rg)
     rg.clear()
+
+
+def excel_edit_start():
+    # アクティブブックを取得
+    wb = xw.books.active
+    # 高速モード>>開始
+    wb.app.calculation = "manual"
+    wb.app.screen_updating = False
+    return wb
+
+
+def excel_edit_end(wb: xw.main.Book):
+    # 高速モード>>終了
+    wb.app.calculation = "automatic"
+    wb.app.screen_updating = True
