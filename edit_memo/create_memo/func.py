@@ -3,19 +3,7 @@ import datetime
 import xlwings as xw
 
 from edit_memo.common import const
-
-
-def get_cell_range(sh: xw.main.Sheet, srn, ern):
-    """
-    連続するセル範囲を取得する
-    :param sh: xlwingsのシートオブジェクト
-    :param srn: start_rg_nm 始まりのセル
-    :param ern: 終わりのセルの起点となるもの
-    :return: セル範囲
-    """
-    start_rg = sh.range(srn)
-    last_rg = sh.range(sh.range(ern).end("down").row, sh.range(ern).end("right").column)
-    return sh.range(start_rg, last_rg)
+from edit_memo.common.util import get_cell_range
 
 
 def func_input_sh(wb: xw.main.Book):

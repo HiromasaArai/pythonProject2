@@ -18,3 +18,8 @@ Sub “o˜^Ï‚İõˆøŒŸõ()
     Dim py_name As String: py_name = "search_index\execute.py"
     Call run_python(get_ini_value("package", "edit_memo") & "\" & py_name)
 End Sub
+
+Sub õˆø“o˜^()
+    Dim py_name As String: py_name = "another_naming\execute.py"
+    Call run_python(get_ini_value("package", "edit_memo") & "\" & py_name)
+End Sub

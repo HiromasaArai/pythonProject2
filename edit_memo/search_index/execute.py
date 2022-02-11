@@ -7,7 +7,8 @@ def search_index(arg_wb):
     rg = get_cell_range(sh, "B6", "B5")
     search_val = sh.range("G3").value
     index_data = rg.options(ndim=2).value
-    is_being = False
+    msg_rg = sh.range("J1")
+    is_being_val = False
     if search_val is not None:
         for i in range(rg.rows.count):
             if index_data[i][5] == search_val:
@@ -15,14 +16,16 @@ def search_index(arg_wb):
                 sh.cells(3, 4).value = index_data[i][2]
                 sh.cells(3, 9).value = index_data[i][3]
                 sh.cells(3, 10).value = index_data[i][4]
-                is_being = True
+                is_being_val = True
+                msg_rg.clear_contents()
                 break
 
-    if not is_being:
+    if not is_being_val:
         sh.cells(3, 3).clear_contents()
         sh.cells(3, 4).clear_contents()
         sh.cells(3, 9).clear_contents()
         sh.cells(3, 10).clear_contents()
+        msg_rg.value = "値が存在しませんでした。"
 
 
 if __name__ == '__main__':

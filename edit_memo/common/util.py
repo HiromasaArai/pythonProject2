@@ -2,9 +2,13 @@ import xlwings as xw
 
 
 def get_cell_range(sh: xw.main.Sheet, srn, ern):
-    # 連続するセル範囲を取得する
-    # srn: str: start_rg_nm    セル範囲の始まり
-    # ern: str: end_base_rg_nm セル範囲の終わり
+    """
+    連続するセル範囲を取得する
+    :param sh: xlwingsのシートオブジェクト
+    :param srn: start_rg_nm 始まりのセル
+    :param ern: 終わりのセルの起点となるもの
+    :return: セル範囲
+    """
     start_rg = sh.range(srn)
     last_rg = sh.range(sh.range(ern).end("down").row, sh.range(ern).end("right").column)
     return sh.range(start_rg, last_rg)
@@ -30,3 +34,16 @@ def excel_edit_end(wb: xw.main.Book):
     # 高速モード>>終了
     wb.app.calculation = "automatic"
     wb.app.screen_updating = True
+
+
+def or_chk_is_none(*args):
+    """
+    引数に一つでもNoneがあったらTrue
+    :param args:
+    :return:
+    """
+    is_result = False
+    for arg in args:
+        if arg is None:
+            is_result = True
+    return is_result

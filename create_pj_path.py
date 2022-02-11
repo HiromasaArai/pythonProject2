@@ -1,11 +1,15 @@
+import configparser
 import os.path
-import sys
 
 if __name__ == '__main__':
-    # コマンドラインから引数受け取り
-    pj_path = sys.argv[1]
-    pj_path_conf = pj_path + "/.venv/set_path.pth"
-    # 設定ファイル = Pythonプロジェクトを指し示す設定ファイル
+    """
+    設定ファイル(Pythonプロジェクトを指し示す設定ファイル)を作成する
+    """
+    ini = configparser.ConfigParser()
+    ini.read(r"C:\PythonPath.ini", "UTF-8")
+    pj_path = ini["user_path"]["py_pj"]
+    venv_nm = ini["user_path"]["venv"]
+    pj_path_conf = f"{pj_path}/{venv_nm}/set_path.pth"
     # 設定ファイルがある場合は削除する
     if os.path.exists(pj_path_conf):
         os.remove(pj_path_conf)

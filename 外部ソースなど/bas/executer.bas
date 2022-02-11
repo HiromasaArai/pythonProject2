@@ -78,11 +78,12 @@ Sub run_python(py_name As String)
         Dim wsh As Object: Set wsh = CreateObject("WScript.Shell")
         
         ' 実行したいpyファイルが存在するプロジェクトディレクトリ
-        Dim py_pj As String: py_pj = get_ini_value("python_path", "py_pj")
+        Dim py_pj As String: py_pj = get_ini_value("user_path", "py_pj")
 
         ' 実行したい仮想環境
         Dim py_venv As String
-        py_venv = py_pj & "\" & get_ini_value("python_path", "venv") & "\" & get_ini_value("python_path", "venv_batch")
+        Dim venv_nm As String: venv_nm = get_ini_value("user_path", "venv")
+        py_venv = py_pj & "\" & venv_nm & "\" & get_ini_value("user_path", "venv_batch")
         
         ' 実行したいpyモジュール(Python探索パスを設定するpyモジュール)
         Dim create_pj_path As String: create_pj_path = py_pj & "\create_pj_path.py"
