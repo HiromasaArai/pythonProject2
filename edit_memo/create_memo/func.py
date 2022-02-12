@@ -24,16 +24,15 @@ def func_input_sh(wb: xw.main.Book):
     return rg
 
 
-def func_toc_sh(wb: xw.main.Book, rrc, ish_array):
+def func_toc_sh(wb: xw.main.Book, ish_array):
     """
-    目次シート編集
+    目次シート編集　及び取得した入力シートデータの並び替え
     :param wb:
-    :param rrc:
     :param ish_array:
-    :return:
+    :return:項番の付与された入力シートデータ（二次元配列）
     """
     sh = wb.sheets(const.TOC_SH_NAME)
-    for i in range(rrc):
+    for i in range(len(ish_array)):
         # 分類
         sh.cells(i + 3, 2).value = ish_array[i][3]
         # 標語
@@ -91,46 +90,64 @@ def func_cover(wb, ish_array):
     end_update_date_rg.value = sorted(ish_array, key=lambda x: x[9], reverse=True)[0][9]
 
 
-def func_contents(wb: xw.main.Book, rrc, ish_array):
+def func_contents(wb: xw.main.Book, ish_array):
     """
     内容シート編集
     :param wb:
-    :param rrc:
     :param ish_array:
-    :return:
+    :return: None
     """
     sh = wb.sheets(const.CONTENTS_SH_NAME)
-    for i in range(rrc):
-        magic_num = i * 6 + 3
-        # 項目記入
+    # 索引シートのデータを取得　i_index_array
+    i_index_array = get_cell_range(wb.sheets(const.INPUT_INDEX_SH_NAME), "B6", "B5").options(ndim=2).value
+    for i in range(len(ish_array)):
+        magic_num = i * 7 + 3
+        # 項目記入:標語
         sh.cells(magic_num + 0, 2).value = i + 1
         sh.cells(magic_num + 0, 3).value = "標語"
         sh.cells(magic_num + 0, 3).font.bold = True
         sh.cells(magic_num + 0, 4).value = ish_array[i][1]
-        sh.cells(magic_num + 1, 3).value = "分類"
-        sh.cells(magic_num + 1, 4).value = ish_array[i][3]
-        sh.cells(magic_num + 2, 3).value = "事実"
-        sh.cells(magic_num + 2, 4).value = ish_array[i][4]
-        sh.cells(magic_num + 3, 3).value = "抽象"
-        sh.cells(magic_num + 3, 4).value = ish_array[i][5]
-        sh.cells(magic_num + 4, 3).value = "転用"
-        sh.cells(magic_num + 4, 4).value = ish_array[i][6]
-        sh.cells(magic_num + 5, 3).value = "補足"
-        sh.cells(magic_num + 5, 4).value = ish_array[i][7]
+        # 項目記入:別名
+        synonym = ""
+        for i_index in i_index_array:
+            # 管理番号の一致判定と標語の不一致判定
+            if i_index[5] == ish_array[i][0] and i_index[3] != ish_array[i][1]:
+                if synonym == "":
+                    synonym += i_index[3]
+                else:
+                    synonym += ", " + i_index[3]
+        sh.cells(magic_num + 1, 3).value = "別名"
+        if synonym != "":
+            sh.cells(magic_num + 1, 4).value = synonym
+        # 項目記入:分類
+        sh.cells(magic_num + 2, 3).value = "分類"
+        sh.cells(magic_num + 2, 4).value = ish_array[i][3]
+        # 項目記入:事実
+        sh.cells(magic_num + 3, 3).value = "事実"
+        sh.cells(magic_num + 3, 4).value = ish_array[i][4]
+        # 項目記入:抽象
+        sh.cells(magic_num + 4, 3).value = "抽象"
+        sh.cells(magic_num + 4, 4).value = ish_array[i][5]
+        # 項目記入:転用
+        sh.cells(magic_num + 5, 3).value = "転用"
+        sh.cells(magic_num + 5, 4).value = ish_array[i][6]
+        # 項目記入:補足
+        sh.cells(magic_num + 6, 3).value = "補足"
+        sh.cells(magic_num + 6, 4).value = ish_array[i][7]
         # 項目記入:記入日（更新日）
         sh.cells(magic_num + 0, 5).value = ish_array[i][9]
         sh.range(sh.cells(magic_num + 0, 4), sh.cells(magic_num + 5, 4)).api.WrapText = True
         # 罫線を引く1
-        rg = sh.range((magic_num + 0, 3), (magic_num + 5, 4))
+        rg = sh.range((magic_num + 0, 3), (magic_num + 6, 4))
         rg.api.Borders(7).LineStyle = 1
         rg.api.Borders(11).LineStyle = 1
         rg.api.Borders(12).LineStyle = 1
         # 罫線を引く2
-        rg = sh.range((magic_num + 0, 5), (magic_num + 5, 5))
+        rg = sh.range((magic_num + 0, 5), (magic_num + 6, 5))
         rg.api.Borders(11).LineStyle = 1
         rg.api.Borders(12).LineStyle = 1
         # 罫線を引く3
-        rg = sh.range((magic_num + 0, 2), (magic_num + 5, 5))
+        rg = sh.range((magic_num + 0, 2), (magic_num + 6, 5))
         rg.api.Borders(7).LineStyle = 1
         rg.api.Borders(7).Weight = 3
         rg.api.Borders(9).LineStyle = 1
@@ -153,11 +170,10 @@ def index_output(sh: xw.main.Sheet, ish_array, i, last_data_row):
     return last_data_row + 1
 
 
-def func_input_index(wb: xw.main.Book, rrc, ish_array):
+def func_input_index(wb: xw.main.Book, ish_array):
     """
     索引登録シート初期設定及びデータ取得に関する関数
     :param wb:
-    :param rrc:
     :param ish_array:
     :return:
     """
@@ -169,7 +185,7 @@ def func_input_index(wb: xw.main.Book, rrc, ish_array):
         # 索引登録シートのデータをリストして取得
         i_index_array = rg.options(ndim=2).value
         # 入力シートのデータ数だけ繰り返す
-        for i in range(rrc):
+        for i in range(len(ish_array)):
             # 索引登録シートのデータ数だけ繰り返す
             is_match = False
             for i2 in range(rg.rows.count):
@@ -191,7 +207,7 @@ def func_input_index(wb: xw.main.Book, rrc, ish_array):
                 last_data_row = index_output(sh, ish_array, i, last_data_row)
     else:
         # 入力シートのデータ数だけ繰り返す
-        for i in range(rrc):
+        for i in range(len(ish_array)):
             last_data_row = index_output(sh, ish_array, i, last_data_row)
 
     # 罫線を引く
