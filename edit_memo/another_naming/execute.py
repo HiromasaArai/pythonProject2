@@ -7,8 +7,10 @@ def another_naming(arg_wb):
     # 各種パラメータ取得
     i_index_no = sh.range("C3").value
     i_category = sh.range("D3").value
-    i_motto = sh.range("E3").value
-    i_motto_kata = sh.range("F3").value
+    i_motto_rg = sh.range("E3")
+    i_motto = i_motto_rg.value
+    i_motto_kata_rg = sh.range("F3")
+    i_motto_kata = i_motto_kata_rg.value
     i_ctrl_no = sh.range("G3").value
     msg_rg = sh.range("J1")
     # 全ての値にNoneがないことを確認
@@ -58,6 +60,8 @@ def another_naming(arg_wb):
     rg.api.Borders(12).LineStyle = 1
     rg.font.name = "ＭＳ ゴシック"
     msg_rg.clear_contents()
+    i_motto_rg.clear_contents()
+    i_motto_kata_rg.clear_contents()
     return None
 
 

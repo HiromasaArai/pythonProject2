@@ -14,6 +14,8 @@ def search_index(arg_wb):
             if index_data[i][5] == search_val:
                 sh.cells(3, 3).value = index_data[i][1]
                 sh.cells(3, 4).value = index_data[i][2]
+                sh.cells(3, 5).clear_contents()
+                sh.cells(3, 6).clear_contents()
                 sh.cells(3, 9).value = index_data[i][3]
                 sh.cells(3, 10).value = index_data[i][4]
                 is_being_val = True

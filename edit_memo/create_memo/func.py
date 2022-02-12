@@ -21,7 +21,6 @@ def func_input_sh(wb: xw.main.Book):
 
         if rg2.offset(i, 1).value is None:
             rg2.offset(i, 1).value = datetime.datetime.now().date()
-
     return rg
 
 
@@ -49,7 +48,6 @@ def func_toc_sh(wb: xw.main.Book, rrc, ish_array):
         sh.cells(i + 3, 8).value = ish_array[i][0]
         # 項目番号をリストに追加
         ish_array[i].append(i + 1)
-
     rg = get_cell_range(sh, "B3", "B2")
     # 罫線を引く　それぞれ左、下、右、中
     rg.api.Borders(7).LineStyle = 1
@@ -83,7 +81,6 @@ def func_cover(wb, ish_array):
     # 前回更新日
     if last_update_date_rg.value is not None:
         second_last_update_date_rg.value = last_update_date_rg.value
-
     # 最終更新日
     last_update_date_rg.value = datetime.datetime.now().strftime("%Y/%m/%d %T")
     # 項目数
@@ -122,6 +119,7 @@ def func_contents(wb: xw.main.Book, rrc, ish_array):
         sh.cells(magic_num + 5, 4).value = ish_array[i][7]
         # 項目記入:記入日（更新日）
         sh.cells(magic_num + 0, 5).value = ish_array[i][9]
+        sh.range(sh.cells(magic_num + 0, 4), sh.cells(magic_num + 5, 4)).api.WrapText = True
         # 罫線を引く1
         rg = sh.range((magic_num + 0, 3), (magic_num + 5, 4))
         rg.api.Borders(7).LineStyle = 1
@@ -139,7 +137,6 @@ def func_contents(wb: xw.main.Book, rrc, ish_array):
         rg.api.Borders(9).Weight = 3
         rg.api.Borders(10).LineStyle = 1
         rg.api.Borders(10).Weight = 3
-
     # フォントネームを強制
     rg = get_cell_range(sh, "B3", "C2")
     rg.font.name = "ＭＳ ゴシック"
@@ -174,16 +171,23 @@ def func_input_index(wb: xw.main.Book, rrc, ish_array):
         # 入力シートのデータ数だけ繰り返す
         for i in range(rrc):
             # 索引登録シートのデータ数だけ繰り返す
-            is_flag = True
+            is_match = False
             for i2 in range(rg.rows.count):
+                # 値の一致確認：管理No
                 term1 = ish_array[i][0] == i_index_array[i2][5]
+                # 値の一致確認：分類
                 term2 = ish_array[i][3] == i_index_array[i2][2]
+                # 値の一致確認：標語
                 term3 = ish_array[i][1] == i_index_array[i2][3]
+                # 値の一致確認：ヒョウゴ
                 term4 = ish_array[i][2] == i_index_array[i2][4]
-                if term1 and term2 and term3 and term4:
-                    is_flag = False
-
-            if is_flag:
+                if term1:
+                    # 管理Noが一致していれば目次No入れ替え
+                    sh.range("C6").offset(i2, 0).value = ish_array[i][10]
+                    if term2 and term3 and term4:
+                        is_match = True
+            # 索引登録シート内に一致しているデータがない場合は新規登録
+            if not is_match:
                 last_data_row = index_output(sh, ish_array, i, last_data_row)
     else:
         # 入力シートのデータ数だけ繰り返す
@@ -219,7 +223,6 @@ def func_index(wb: xw.main.Book):
         sh.cells(i + 3, 4).value = i_index_array[i][2]
         sh.cells(i + 3, 5).value = i_index_array[i][1]
         sh.cells(i + 3, 6).value = i_index_array[i][5]
-
     # 罫線を引く
     rg = get_cell_range(sh, "B3", "B2")
     rg.api.Borders(7).LineStyle = 1
