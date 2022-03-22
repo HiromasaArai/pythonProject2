@@ -191,17 +191,11 @@ def func_input_index(wb: xw.main.Book, ish_array):
             for i2 in range(rg.rows.count):
                 # 値の一致確認：管理No
                 term1 = ish_array[i][0] == i_index_array[i2][5]
-                # 値の一致確認：分類
-                term2 = ish_array[i][3] == i_index_array[i2][2]
-                # 値の一致確認：標語
-                term3 = ish_array[i][1] == i_index_array[i2][3]
-                # 値の一致確認：ヒョウゴ
-                term4 = ish_array[i][2] == i_index_array[i2][4]
                 if term1:
-                    # 管理Noが一致していれば目次No入れ替え
+                    # 管理Noが一致していれば目次Noと分類入れ替え
                     sh.range("C6").offset(i2, 0).value = ish_array[i][10]
-                    if term2 and term3 and term4:
-                        is_match = True
+                    sh.range("C6").offset(i2, 1).value = ish_array[i][3]
+                    is_match = True
             # 索引登録シート内に一致しているデータがない場合は新規登録
             if not is_match:
                 last_data_row = index_output(sh, ish_array, i, last_data_row)
