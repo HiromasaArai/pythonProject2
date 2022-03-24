@@ -136,7 +136,8 @@ def func_contents(wb: xw.main.Book, ish_array):
         sh.cells(magic_num + 6, 4).value = ish_array[i][7]
         # 項目記入:記入日（更新日）
         sh.cells(magic_num + 0, 5).value = ish_array[i][9]
-        sh.range(sh.cells(magic_num + 0, 4), sh.cells(magic_num + 5, 4)).api.WrapText = True
+        # 折り返して表示
+        sh.range(sh.cells(magic_num + 0, 4), sh.cells(magic_num + 6, 4)).api.WrapText = True
         # 罫線を引く1
         rg = sh.range((magic_num + 0, 3), (magic_num + 6, 4))
         rg.api.Borders(7).LineStyle = 1
