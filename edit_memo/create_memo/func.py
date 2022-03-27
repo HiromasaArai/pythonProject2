@@ -56,6 +56,22 @@ def func_toc_sh(wb: xw.main.Book, ish_array):
     rg.api.Borders(12).LineStyle = 1
     # フォントネームを強制
     rg.font.name = "ＭＳ ゴシック"
+    # 列幅自動調整
+    sh.range("B:H").autofit()
+    # 同一頭文字を色でグルーピング
+    cell_row_i = 4
+    cell_col = 2
+    end_cell_col = cell_col + 6
+    is_switch = False
+    sh.range((cell_row_i - 1, cell_col), (cell_row_i - 1, end_cell_col)).color = (255, 215, 0)
+    while sh.cells(cell_row_i, cell_col).value is not None:
+        if sh.cells(cell_row_i, cell_col).value != sh.cells(cell_row_i - 1, cell_col).value:
+            is_switch = not is_switch
+        if is_switch:
+            sh.range((cell_row_i, cell_col), (cell_row_i, end_cell_col)).color = None
+        else:
+            sh.range((cell_row_i, cell_col), (cell_row_i, end_cell_col)).color = (255, 215, 0)
+        cell_row_i += 1
     return ish_array
 
 
@@ -158,6 +174,9 @@ def func_contents(wb: xw.main.Book, ish_array):
     # フォントネームを強制
     rg = get_cell_range(sh, "B3", "C2")
     rg.font.name = "ＭＳ ゴシック"
+    # 列自動調整
+    sh.range("B:B").autofit()
+    sh.range("E:E").autofit()
     return None
 
 
@@ -243,3 +262,18 @@ def func_index(wb: xw.main.Book):
     rg.api.Borders(12).LineStyle = 1
     # フォントネームを強制
     rg.font.name = "ＭＳ ゴシック"
+    # 列幅の自動調整
+    sh.range("B:F").autofit()
+    # 同一頭文字を色でグルーピング
+    cell_row_i = 4
+    cell_col = 2
+    is_switch = False
+    sh.range((cell_row_i - 1, cell_col), (cell_row_i - 1, cell_col + 4)).color = (255, 215, 0)
+    while sh.cells(cell_row_i, cell_col).value is not None:
+        if str(sh.cells(cell_row_i, cell_col + 1).value)[0] != str(sh.cells(cell_row_i - 1, cell_col + 1).value)[0]:
+            is_switch = not is_switch
+        if is_switch:
+            sh.range((cell_row_i, cell_col), (cell_row_i, cell_col + 4)).color = None
+        else:
+            sh.range((cell_row_i, cell_col), (cell_row_i, cell_col + 4)).color = (255, 215, 0)
+        cell_row_i += 1
